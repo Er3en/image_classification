@@ -1,0 +1,26 @@
+# @package _global_
+
+DEBUG: false
+PROFILE: false
+path: /home/jarybski/Desktop/Animal-10/archive/raw-img/
+trainer:  
+  epochs: 1000
+  optimizer: torch.optim.Adam
+  lr: 0.001
+dataloader:
+    _target_: src.dataloader
+    root_path: data/dataset/
+    batch_size: 10
+    shuffle: false
+    sampler: false
+    batch_sampler: false
+    num_workers: 1
+    collate_fn: false
+    pin_memory: False
+    drop_last: False
+    timeout: 0
+    worker_init_fn: false
+    prefetch_factor: 2
+    persistent_workers: False
+   
+    
