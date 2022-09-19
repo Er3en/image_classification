@@ -2,6 +2,7 @@ import numpy as np
 import progressbar 
 from progressbar import *
 from rich.progress import track
+import matplotlib.pyplot as plt
 
 def center_image(img):
     size = [256, 256]
@@ -20,3 +21,11 @@ def progress_bar(array):
     
     bar = progressbar.ProgressBar(maxval=len(array),widgets=widgets).start()
     return bar
+
+def show_images(train_df, images, rows, cols):
+    fig, axes = plt.subplots(nrows=rows, ncols=cols, figsize=(20,20))
+    for i in range(10):
+        path = train_df[train_df.category == i].values[2]
+        axes[i//cols, i%cols].set_title(path[0].split('/')[-2] + str(path[1]))
+        axes[i//cols, i%cols].imshow(images[train_df[train_df.filename == path[0]].index[0]])
+    plt.show()

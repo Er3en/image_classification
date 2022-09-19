@@ -14,8 +14,14 @@ class ClassificationDataset(torch.utils.data.Dataset):
                 batch_size:int = 16, 
                 shuffle: bool = True,
                 tile_size: Tuple = (256,256),
-                random_state: int = 16
+                random_state: int = 16,
+                show_image: bool = True
                 ):
+        self.dict = {'scoiattolo':'squirrel','cavallo':'horse',
+            'farfalla':'butterfly','mucca':'cow','gatto':'cat', 
+            'pecora':'sheep','gallina':'chicken','cane':'dog',
+            'elefante':'elephant','ragno':'spider'
+            }
         
         self.data_path = data_path
         self.batch_size = batch_size
@@ -23,25 +29,33 @@ class ClassificationDataset(torch.utils.data.Dataset):
         self.tile_size = tile_size
         self.random_state = random_state
         self.dataset = self._get_classification_ds()
+        self.dataframe = self.dataset
         self.dataset = self._read_images()
-        self.length = len(self.dataset)
-      
+        self.show_image = show_image
+        if self.show_image: 
+            show_images(self.dataframe, self.dataset, 2, 5)
+    
 
     def __len__(self):
-        return self.length
+        return len(self.dataset)
 
     def __getitem__(self,idx):
-        return idx
+        item = self.dataset[idx]
+        return item
+
+     
 
     def _get_classification_ds(self):
         folders = os.listdir(self.data_path)
         categories = []
         files = []
-        for k, dir in enumerate(folders):
+        for dir in folders:
             filename = os.listdir(self.data_path + dir)
+            if dir in self.dict.keys():
+                cat = self.dict[dir]
             for file in filename:
                 files.append(self.data_path+dir+"/"+file)
-                categories.append(k)
+                categories.append(cat)
 
         df = pd.DataFrame({"filename": files, "category": categories})
         train_df = pd.DataFrame(columns=['filename', 'category'])
@@ -66,7 +80,3 @@ class ClassificationDataset(torch.utils.data.Dataset):
             bar.update(idx + 1)
         images = np.array(images)
         return images
-
-
-
-
