@@ -2,14 +2,15 @@
 
 DEBUG: false
 PROFILE: false
-path: /home/jarybski/Desktop/Animal-10/archive/raw-img/
+
 trainer:  
   epochs: 1000
   optimizer: torch.optim.Adam
   lr: 0.001
-dataloader:
+dataset:
     _target_: src.dataloader
     root_path: data/dataset/
+    path: /home/jarybski/Desktop/Animal-10/archive/raw-img
     batch_size: 10
     shuffle: false
     sampler: false
@@ -22,5 +23,4 @@ dataloader:
     worker_init_fn: false
     prefetch_factor: 2
     persistent_workers: False
-   
-    
+  
