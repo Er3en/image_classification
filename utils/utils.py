@@ -4,7 +4,7 @@ from rich.progress import track
 import matplotlib.pyplot as plt
 import random
 from PIL import Image
-from datasets import *
+from ..datasets.dataset import Classification_Dataset
 from sklearn.model_selection import train_test_split
 from hydra import compose, initialize
 from omegaconf import OmegaConf
