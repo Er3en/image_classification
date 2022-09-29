@@ -4,23 +4,23 @@ DEBUG: false
 PROFILE: false
 
 trainer:  
-  epochs: 1000
+  epochs: 100
   optimizer: torch.optim.Adam
-  lr: 0.001
+  lr: 0.0008
 dataset:
-    _target_: src.dataloader
-    root_path: data/dataset/
-    path: /home/jarybski/Desktop/Animal-10/archive/raw-img
-    batch_size: 10
-    shuffle: false
-    sampler: false
-    batch_sampler: false
-    num_workers: 1
-    collate_fn: false
-    pin_memory: False
-    drop_last: False
-    timeout: 0
-    worker_init_fn: false
-    prefetch_factor: 2
-    persistent_workers: False
+  path: /home/jarybski/Desktop/Animal-10/archive/raw-img
+  img_size: 256
+  batch_size: 10
+  shuffle: True
+  pin_memory: False
+  sampler: False
+  random_state: 192
+  batch_sampler: False
+  num_workers: 2
+  collate_fn: false
+  pin_memory: False
+  drop_last: False
+  timeout: 0
+  prefetch_factor: 2
+  persistent_workers: False
   
