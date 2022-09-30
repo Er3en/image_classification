@@ -2,7 +2,7 @@ from unittest import TestCase
 import unittest
 from hydra import compose, initialize
 from omegaconf import OmegaConf
-from src.dataset.dataset import ClassificationDataset
+from datasets import ClassificationDataset
 
 ####TODO###
 class TestDataset(TestCase):
