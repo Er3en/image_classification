@@ -2,7 +2,6 @@ import os
 import torch
 from pandas import DataFrame
 from pathlib import Path
-from utils import *
 from typing import Tuple
 import cv2
 from sklearn.preprocessing import LabelEncoder
@@ -10,17 +9,14 @@ from torchvision import datasets, models, transforms
 
 class Classification_Dataset(torch.utils.data.Dataset):
     def __init__(self,
-                data_path: Path,    
                 dataframe=None,
-                labels:dict=None,
+                labels:dict ={},
                 transforms=None,
                 shuffle: bool = True,
                 tile_size: Tuple = (256,256),
                 show_image: bool = False,
                 ):
               
-       
-        self.data_path = data_path
         self.dataframe = dataframe
         self.labels = labels
         self.transforms = transforms
@@ -29,8 +25,6 @@ class Classification_Dataset(torch.utils.data.Dataset):
         self.show_image = show_image
         self.label_enc = LabelEncoder()
         self.label_enc.fit(list(self.labels.values()))
-
-
 
     def __len__(self):
         return len(self.dataframe.index)

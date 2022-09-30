@@ -3,20 +3,20 @@ DEBUG: False
 PROFILE: False
 
 trainer:  
-  - epochs: 100
-  - lr: 0.0008
+  epochs: 100
+  lr: 0.0008
 
 dataset:
-  - path: /home/jarybski/Desktop/Animal-10/archive/raw-img
-  - img_size: 256
-  - batch_size: 10
-  - shuffle: True
-  - pin_memory: False
-  - sampler: False
-  - random_state: 192
-  - batch_sampler: False
-  - num_workers: 2
-  - pin_memory: False
-  - drop_last: False
+  path: /home/jarybski/Desktop/Animal-10/archive/raw-img
+  img_size: 256
+  batch_size: 10
+  shuffle: True
+  pin_memory: False
+  sampler: False
+  random_state: 192
+  batch_sampler: False
+  num_workers: 2
+  pin_mem: False
+  drop_last: False
 
     

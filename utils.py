@@ -4,11 +4,11 @@ from rich.progress import track
 import matplotlib.pyplot as plt
 import random
 from PIL import Image
-from ..datasets.dataset import Classification_Dataset
+from dataset import Classification_Dataset
 from sklearn.model_selection import train_test_split
 from hydra import compose, initialize
 from omegaconf import OmegaConf
-from .transforms import *
+from transforms import *
 from torch.utils.data import DataLoader
 import pandas as pd
 
@@ -30,7 +30,6 @@ def progress_bar(array):
     
     bar = progressbar.ProgressBar(maxval=len(array),widgets=widgets).start()
     return bar
-
 
 
 def show_images(df):
@@ -68,6 +67,7 @@ def create_df():
     cfg_ds = cfg.dataset
     data = {'path': [],'label': []}
     labels = get_labels()
+
     for  dir in os.listdir(cfg_ds.path):
         filename = os.listdir(f'{cfg_ds.path}/{dir}')    
         for file in filename:
@@ -77,25 +77,22 @@ def create_df():
     return df_data, labels
 
 
-
-
 def create_dataloaders():
     cfg = OmegaConf.load("cfg/config.yaml")
-    print(cfg)
+
     cfg_ds = cfg.dataset
-
     df, labels = create_df()
-    df_train, df_valid = train_test_split(df, test_size=0.2, random_state=cfg.datset.random_state, stratify=df['label'])
-
-    train_dataset = Classification_Dataset(df_train, labels, shuffle=True, transforms=transform_train(cfg))
-    val_dataset = Classification_Dataset(df_valid, labels, shuffle=True, transforms=transform_val(cfg))
+    df_train, df_valid = train_test_split(df, test_size=0.2, random_state=cfg.dataset.random_state, stratify=df['label'])
+    
+    train_dataset = Classification_Dataset(dataframe=df_train,labels=labels, shuffle=True, transforms=transform_train(cfg))
+    val_dataset = Classification_Dataset(dataframe=df_valid,labels=labels, shuffle=True, transforms=transform_val(cfg))
     
     train_loader = DataLoader(
         train_dataset, 
         batch_size=cfg_ds.batch_size, 
         shuffle=cfg_ds.shuffle, 
         num_workers=cfg_ds.num_workers,
-        pin_memory=cfg_ds.pin_memory
+        pin_memory=cfg_ds.pin_mem
     )
 
     val_loader = DataLoader(
@@ -103,7 +100,7 @@ def create_dataloaders():
         batch_size=cfg_ds.batch_size,                       
         shuffle=cfg_ds.shuffle, 
         num_workers=cfg_ds.num_workers,
-        pin_memory=cfg_ds.pin_memory
+        pin_memory=cfg_ds.pin_mem
         )
 
-    return train_loader, val_loader
+    return train_loader, val_loader, labels
