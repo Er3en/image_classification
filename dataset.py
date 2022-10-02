@@ -1,12 +1,14 @@
 import os
 import torch
+import torch.utils.data.dataset
+from torchvision import transforms
 from pandas import DataFrame
 from pathlib import Path
 from typing import Tuple
 import cv2
 from sklearn.preprocessing import LabelEncoder
 from torchvision import datasets, models, transforms
-
+from PIL import Image
 class Classification_Dataset(torch.utils.data.Dataset):
     def __init__(self,
                 dataframe=None,
@@ -34,9 +36,22 @@ class Classification_Dataset(torch.utils.data.Dataset):
         img_path = item['path']
         img = cv2.cvtColor(cv2.imread(img_path), cv2.COLOR_BGR2RGB)
         print([item['label']])
+        
+        ###FIX
+        if self.transforms:
+            transforms = [img.Res]
+            img = Image.fromarray(img)
+
+            
+            img = self.transforms(img)#['image']
+            print(img.shape())
+
         target = self.label_enc.transform([item['label']])
-        print(target)
-        return img, torch.tensor(target, dtype=torch.long)
+        print("image shape",img.shape())
+
+        return {'image': img,
+                 'target': torch.tensor(target, dtype=torch.long)
+        }
 
 
 

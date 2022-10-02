@@ -84,8 +84,8 @@ def create_dataloaders():
     df, labels = create_df()
     df_train, df_valid = train_test_split(df, test_size=0.2, random_state=cfg.dataset.random_state, stratify=df['label'])
     
-    train_dataset = Classification_Dataset(dataframe=df_train,labels=labels, shuffle=True, transforms=transform_train(cfg))
-    val_dataset = Classification_Dataset(dataframe=df_valid,labels=labels, shuffle=True, transforms=transform_val(cfg))
+    train_dataset = Classification_Dataset(dataframe=df_train,labels=labels, shuffle=True, transforms=transform('train', cfg))
+    val_dataset = Classification_Dataset(dataframe=df_valid, labels=labels, shuffle=True, transforms=transform('val', cfg))
     
     train_loader = DataLoader(
         train_dataset, 
