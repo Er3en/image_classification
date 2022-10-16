@@ -64,8 +64,8 @@ def main(cfg):
     history = defaultdict(list)
     for epoch in range(cfg.trainer.epochs):
         gc.collect()
-        train_epoch_loss = train_one_ep(model, optimizer, scheduler,dataloader=train_loader,device=device, epoch=epoch)
-        val_epoch_loss = train_one_ep(model, optimizer, scheduler,dataloader=train_loader,device=device, epoch=epoch)
+        train_epoch_loss = train_one_ep(model, optimizer, scheduler,dataloader=train_loader, device=device, epoch=epoch)
+        val_epoch_loss = train_one_ep(model, optimizer, scheduler,dataloader=train_loader, device=device, epoch=epoch)
         wandb.log({'Train loss': train_epoch_loss})
     end = time.time()
     time_elapsed = end - start
