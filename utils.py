@@ -4,14 +4,17 @@ from rich.progress import track
 import matplotlib.pyplot as plt
 import random
 from PIL import Image
-from dataset import Classification_Dataset
+
 from sklearn.model_selection import train_test_split
 from hydra import compose, initialize
 from omegaconf import OmegaConf
-from transforms import *
+import torch
 from torch.utils.data import DataLoader
 import pandas as pd
+import tqdm as tqdm
 
+from dataset import Classification_Dataset
+from transforms import transform
 
 def center_image(img):
     size = [256, 256]
@@ -104,7 +107,3 @@ def create_dataloaders():
         )
 
     return train_loader, val_loader, labels
-
-#TODO
-def normalize()
-    pass 

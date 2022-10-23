@@ -45,11 +45,12 @@ class Classification_Dataset(torch.utils.data.Dataset):
         if self.trans:
             img = self.trans(tensor_img)
 
-        target = self.label_enc.transform([item['label']])
-        print("image shape",img.shape)
+        label = self.label_enc.transform([item['label']])
+        print("image shape", img.shape, "label:" ,[item['label']])
+        print("label shape : " ,label.shape)
 
         return {'image': img,
-                 'target': torch.tensor(target, dtype=torch.long)
+                'label': torch.tensor(label, dtype=torch.long)
         }
 
 
