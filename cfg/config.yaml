@@ -3,13 +3,13 @@ DEBUG: False
 PROFILE: False
 
 trainer:  
-  epochs: 100
-  lr: 0.0008
-
+  epochs: 3000
+  lr: 0.00001
+  log: 1
 dataset:
   path: /home/jarybski/Desktop/Animal-10/archive/raw-img
-  img_size: 256
-  batch_size: 10
+  img_size: 224
+  batch_size: 4
   shuffle: True
   pin_memory: False
   sampler: False
@@ -18,5 +18,6 @@ dataset:
   num_workers: 2
   pin_mem: False
   drop_last: False
-
+  mean: [0.5167, 0.4939, 0.4083]
+  std: [0.2652, 0.2610, 0.2761]
     

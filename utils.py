@@ -4,14 +4,17 @@ from rich.progress import track
 import matplotlib.pyplot as plt
 import random
 from PIL import Image
-from dataset import Classification_Dataset
+
 from sklearn.model_selection import train_test_split
 from hydra import compose, initialize
 from omegaconf import OmegaConf
-from transforms import *
+import torch
 from torch.utils.data import DataLoader
 import pandas as pd
+import tqdm as tqdm
 
+from dataset import Classification_Dataset
+from transforms import transform
 
 def center_image(img):
     size = [256, 256]
@@ -84,8 +87,8 @@ def create_dataloaders():
     df, labels = create_df()
     df_train, df_valid = train_test_split(df, test_size=0.2, random_state=cfg.dataset.random_state, stratify=df['label'])
     
-    train_dataset = Classification_Dataset(dataframe=df_train,labels=labels, shuffle=True, transforms=transform_train(cfg))
-    val_dataset = Classification_Dataset(dataframe=df_valid,labels=labels, shuffle=True, transforms=transform_val(cfg))
+    train_dataset = Classification_Dataset(dataframe=df_train,labels=labels, shuffle=True, trans=transform('train', cfg))
+    val_dataset = Classification_Dataset(dataframe=df_valid, labels=labels, shuffle=True, trans=transform('val', cfg))
     
     train_loader = DataLoader(
         train_dataset, 
@@ -100,7 +103,7 @@ def create_dataloaders():
         batch_size=cfg_ds.batch_size,                       
         shuffle=cfg_ds.shuffle, 
         num_workers=cfg_ds.num_workers,
-        pin_memory=cfg_ds.pin_mem
+        pin_memory=cfg_ds.pin_mem,
         )
 
     return train_loader, val_loader, labels
