@@ -1,4 +1,3 @@
-from email.mime import image
 import os
 import torch
 import cv2
@@ -11,6 +10,7 @@ from transforms import transform
 from sklearn.preprocessing import LabelEncoder
 from torchvision import datasets, models, transforms
 from PIL import Image
+
 class Classification_Dataset(torch.utils.data.Dataset):
     def __init__(self,
                 dataframe=None,
@@ -39,15 +39,13 @@ class Classification_Dataset(torch.utils.data.Dataset):
         convert_to_tensor = transforms.ToTensor()
         img = cv2.cvtColor(cv2.imread(img_path), cv2.COLOR_BGR2RGB)
         tensor_img = convert_to_tensor(img)
-        print([item['label']])
 
-        # ###FIX
         if self.trans:
             img = self.trans(tensor_img)
 
         label = self.label_enc.transform([item['label']])
-        print("image shape", img.shape, "label:" ,[item['label']])
-        print("label shape : " ,label.shape)
+        # print("image shape", img.shape, "label:" ,[item['label']])
+        # print("label shape : " ,label.shape)
 
         return {'image': img,
                 'label': torch.tensor(label, dtype=torch.long)

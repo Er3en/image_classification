@@ -38,7 +38,8 @@ def calc_std_mean(dataloader):
         mean = mean_sum / batch_size
         std = std_sum / batch_size
     return mean, std
-#TODO
+
+
 def normalize():
     data_path = "/home/jarybski/Desktop/Animal-10/archive/raw-img"
     kwargs = {'num_workers':10, 'pin_memory':True, 'persistent_workers':True } if torch.cuda.is_available() else  {}
