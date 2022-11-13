@@ -3,7 +3,7 @@ DEBUG: False
 PROFILE: False
 
 trainer:  
-  epochs: 3000
+  epochs: 1000
   lr: 0.00001
   log: 1
 dataset:

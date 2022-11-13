@@ -1,17 +1,19 @@
 import numpy as np
-from progressbar import *
-from rich.progress import track
 import matplotlib.pyplot as plt
 import random
-from PIL import Image
+import pandas as pd
 
+import torch
+import gc
+from tqdm import tqdm
+from PIL import Image
+from progressbar import *
 from sklearn.model_selection import train_test_split
 from hydra import compose, initialize
 from omegaconf import OmegaConf
-import torch
+from rich.progress import track
 from torch.utils.data import DataLoader
-import pandas as pd
-import tqdm as tqdm
+from torch import nn
 
 from dataset import Classification_Dataset
 from transforms import transform
@@ -52,7 +54,8 @@ def show_images(df):
 
 
 def get_labels():
-    labels = {'cane': 'dog',
+    labels = {
+    'cane': 'dog',
     'cavallo': 'horse',
     'elefante': 'elephant',
     'farfalla': 'butterfly',
@@ -87,8 +90,16 @@ def create_dataloaders():
     df, labels = create_df()
     df_train, df_valid = train_test_split(df, test_size=0.2, random_state=cfg.dataset.random_state, stratify=df['label'])
     
-    train_dataset = Classification_Dataset(dataframe=df_train,labels=labels, shuffle=True, trans=transform('train', cfg))
-    val_dataset = Classification_Dataset(dataframe=df_valid, labels=labels, shuffle=True, trans=transform('val', cfg))
+    train_dataset = Classification_Dataset(
+                                           dataframe=df_train,
+                                           labels=labels, 
+                                           shuffle=True, 
+                                           trans=transform('train', cfg))
+    val_dataset = Classification_Dataset(
+                                         dataframe=df_valid, 
+                                         labels=labels, 
+                                         shuffle=True, 
+                                         trans=transform('val', cfg))
     
     train_loader = DataLoader(
         train_dataset, 
@@ -107,3 +118,69 @@ def create_dataloaders():
         )
 
     return train_loader, val_loader, labels
+
+
+def criterion(outputs, label):
+    return nn.CrossEntropyLoss()(outputs, label)
+
+def get_bar(dataloader):
+   bar = tqdm(enumerate(dataloader), total=len(dataloader))
+   return bar
+
+
+def train_step(model, optimizer, scheduler, dataloader, device, epoch):
+    model.train()
+    bar = get_bar(dataloader)
+    
+    for step, data in  bar:
+        dataset_size = 0
+        running_loss = 0.0
+       
+        images = data['image'].to(device, dtype=torch.float)
+        label = data['label'].to(device, dtype=torch.long)
+        label = torch.reshape(label, (-1,))
+   
+        batch_size = images.size(0)
+        outputs = model(images)
+        loss = criterion(outputs, label)
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+       
+        if scheduler is not None: 
+            scheduler.step()
+        running_loss += (loss.item() * batch_size)
+        dataset_size += batch_size
+        
+        epoch_loss = running_loss / dataset_size
+
+        bar.set_postfix(Epoch=epoch, Train_Loss= epoch_loss, LR=optimizer.param_groups[0]['lr'])
+        gc.collect()
+        return epoch_loss
+
+def validation_step(model, optimizer, scheduler, dataloader, device, epoch):
+    bar = get_bar(dataloader)
+
+    model.eval()
+    dataset_size = 0
+    running_loss = 0.0
+    for step, data in  bar:
+        images = data['image'].to(device, dtype=torch.float)
+        label = data['label'].to(device, dtype=torch.long)
+        label = torch.reshape(label, (-1,))
+        batch_size = images.size(0)
+
+    outputs = model(images)
+    loss = criterion(outputs, label)
+
+    running_loss += (loss.item() * batch_size)
+    dataset_size += batch_size
+    
+    epoch_loss = running_loss / dataset_size
+    
+    bar.set_postfix(Epoch=epoch, Valid_Loss=epoch_loss,
+                    LR=optimizer.param_groups[0]['lr'])   
+    
+    gc.collect()
+    
+    return epoch_loss

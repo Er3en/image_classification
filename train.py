@@ -6,7 +6,7 @@ import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.optim import lr_scheduler
 from utils import create_dataloaders
-
+from utils import train_step, validation_step
 import hydra
 import numpy as np
 from omegaconf import DictConfig, OmegaConf
@@ -19,71 +19,6 @@ from copy import deepcopy
 import copy
 
 
-def criterion(outputs, label):
-    return nn.CrossEntropyLoss()(outputs, label)
-
-def get_bar(dataloader):
-   bar = tqdm(enumerate(dataloader), total=len(dataloader))
-   return bar
-
-def train_step(model, optimizer, scheduler, dataloader, device, epoch):
-    model.train()
-    bar = get_bar(dataloader)
-    
-    for step, data in  bar:
-        dataset_size = 0
-        running_loss = 0.0
-       
-        images = data['image'].to(device, dtype=torch.float)
-        label = data['label'].to(device, dtype=torch.long)
-        label = torch.reshape(label, (-1,))
-   
-        batch_size = images.size(0)
-        outputs = model(images)
-        loss = criterion(outputs, label)
-        loss.backward()
-        optimizer.step()
-        optimizer.zero_grad()
-       
-        if scheduler is not None: 
-            scheduler.step()
-        running_loss += (loss.item() * batch_size)
-        dataset_size += batch_size
-        
-        epoch_loss = running_loss / dataset_size
-
-        bar.set_postfix(Epoch=epoch, Train_Loss= epoch_loss, LR=optimizer.param_groups[0]['lr'])
-        gc.collect()
-        return epoch_loss
-
-def validation_step(model, optimizer, scheduler, dataloader, device, epoch):
-    bar = get_bar(dataloader)
-
-    model.eval()
-    dataset_size = 0
-    running_loss = 0.0
-    for step, data in  bar:
-        images = data['image'].to(device, dtype=torch.float)
-        label = data['label'].to(device, dtype=torch.long)
-        label = torch.reshape(label, (-1,))
-        batch_size = images.size(0)
-
-    outputs = model(images)
-    loss = criterion(outputs, label)
-
-    running_loss += (loss.item() * batch_size)
-    dataset_size += batch_size
-    
-    epoch_loss = running_loss / dataset_size
-    
-    bar.set_postfix(Epoch=epoch, Valid_Loss=epoch_loss,
-                    LR=optimizer.param_groups[0]['lr'])   
-    
-    gc.collect()
-    
-    return epoch_loss
-
-
 @hydra.main(version_base=None, config_path="cfg", config_name="config")
 def main(cfg):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -91,7 +26,7 @@ def main(cfg):
     train_loader, valid_loader, labels = create_dataloaders()
     
     
-    model = A_Model('tf_efficientnet_b0',labels=labels,pretrained=True).cuda()
+    model = A_Model('tf_efficientnet_b0',labels=labels,pretrained=True)
     optimizer = optim.SGD(model.parameters(), cfg.trainer.lr)
     scheduler = lr_scheduler.CosineAnnealingLR(optimizer=optimizer,T_max=1000, eta_min=cfg.trainer.lr)
     start = time.time()
